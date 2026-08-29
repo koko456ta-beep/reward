@@ -27,14 +27,13 @@ export const AwardCard: React.FC<AwardCardProps> = ({ award, onSelectAward }) =>
 
   const handleDirectDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const downloadUrl = award.certificateUrl || award.imageUrl;
-    if (!downloadUrl) return;
+    const downloadUrl = award.certificateUrl || award.imageUrl || '';
 
     try {
       setDownloading(true);
       const safeName = (award.recipientName || 'ผลงาน').replace(/\s+/g, '_');
       const safeTitle = (award.awardName || 'เกียรติบัตร').replace(/\s+/g, '_').slice(0, 30);
-      await downloadAwardImage(downloadUrl, `เกียรติบัตร_${safeName}_${safeTitle}.jpg`);
+      await downloadAwardImage(downloadUrl, `เกียรติบัตร_${safeName}_${safeTitle}.jpg`, award);
     } finally {
       setDownloading(false);
     }
@@ -135,11 +134,16 @@ export const AwardCard: React.FC<AwardCardProps> = ({ award, onSelectAward }) =>
             {award.allowDownload !== false && (
               <button
                 onClick={handleDirectDownload}
-                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-medium flex items-center gap-1 transition-colors"
-                title="ดาวน์โหลดไฟล์เกียรติบัตร"
+                disabled={downloading}
+                className="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 disabled:opacity-50 text-xs font-medium flex items-center gap-1.5 transition-colors"
+                title="ดาวน์โหลดไฟล์ภาพเกียรติบัตรทันที"
               >
-                <Download className="w-3.5 h-3.5 text-blue-600" />
-                <span>ดาวน์โหลด</span>
+                {downloading ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" />
+                ) : (
+                  <Download className="w-3.5 h-3.5 text-blue-600" />
+                )}
+                <span>{downloading ? 'กำลังโหลด...' : 'ดาวน์โหลด'}</span>
               </button>
             )}
             <span className="text-xs font-semibold text-blue-600 group-hover:text-blue-800 flex items-center gap-0.5 pl-1">

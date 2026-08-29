@@ -143,37 +143,37 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 shrink-0">
             <button
               id="nav-home-btn"
               onClick={() => handleSelectDept('all')}
-              className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap shrink-0 px-3 py-1.5 xl:px-3.5 xl:py-2 rounded-xl text-xs xl:text-sm font-medium transition-all duration-150 ${
                 activeView === 'public' && currentDept === 'all'
-                  ? 'bg-blue-50 text-blue-700 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-blue-50 text-blue-700 font-semibold border border-blue-200/70 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/90 border border-transparent'
               }`}
             >
               หน้าแรก
             </button>
 
             {/* Department Dropdown */}
-            <div className="relative">
+            <div className="relative shrink-0">
               <button
                 id="nav-dept-dropdown-btn"
                 onClick={() => setDeptDropdownOpen(!deptDropdownOpen)}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap shrink-0 flex items-center gap-1.5 px-3 py-1.5 xl:px-3.5 xl:py-2 rounded-xl text-xs xl:text-sm font-medium transition-all duration-150 ${
                   currentDept !== 'all' && activeView === 'public'
-                    ? 'bg-blue-50 text-blue-700 font-semibold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    ? 'bg-blue-50 text-blue-700 font-semibold border border-blue-200/70 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/90 border border-transparent'
                 }`}
               >
                 <span>ผลงาน 5 ฝ่าย</span>
-                {currentDept !== 'all' && (
-                  <span className="px-1.5 py-0.2 rounded text-xs bg-blue-200 text-blue-900 font-bold">
+                {currentDept !== 'all' ? (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] xl:text-xs bg-blue-200 text-blue-900 font-bold">
                     {DEPARTMENTS[currentDept]?.shortName}
                   </span>
-                )}
-                <ChevronDown className={`w-4 h-4 transition-transform ${deptDropdownOpen ? 'rotate-180' : ''}`} />
+                ) : null}
+                <ChevronDown className={`w-3.5 h-3.5 xl:w-4 xl:h-4 text-slate-400 transition-transform ${deptDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {deptDropdownOpen && (
@@ -218,10 +218,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="nav-portfolio-btn"
               onClick={() => handleNavigateView('portfolio')}
-              className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap shrink-0 px-3 py-1.5 xl:px-3.5 xl:py-2 rounded-xl text-xs xl:text-sm font-medium transition-all duration-150 ${
                 activeView === 'portfolio'
-                  ? 'bg-blue-50 text-blue-700 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-blue-50 text-blue-700 font-semibold border border-blue-200/70 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/90 border border-transparent'
               }`}
             >
               แฟ้มสะสมงาน (E-Portfolio)
@@ -230,10 +230,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="nav-reports-btn"
               onClick={() => handleNavigateView('reports')}
-              className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap shrink-0 px-3 py-1.5 xl:px-3.5 xl:py-2 rounded-xl text-xs xl:text-sm font-medium transition-all duration-150 ${
                 activeView === 'reports'
-                  ? 'bg-blue-50 text-blue-700 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-blue-50 text-blue-700 font-semibold border border-blue-200/70 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/90 border border-transparent'
               }`}
             >
               สถิติและรายงาน
@@ -242,10 +242,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="nav-about-btn"
               onClick={() => handleNavigateView('about')}
-              className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap shrink-0 px-3 py-1.5 xl:px-3.5 xl:py-2 rounded-xl text-xs xl:text-sm font-medium transition-all duration-150 ${
                 activeView === 'about'
-                  ? 'bg-blue-50 text-blue-700 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-blue-50 text-blue-700 font-semibold border border-blue-200/70 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/90 border border-transparent'
               }`}
             >
               เกี่ยวกับระบบ
@@ -253,20 +253,20 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
 
           {/* Search bar & Action Buttons */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 xl:gap-3 shrink-0">
             {/* Quick Search */}
             {setSearchQuery && (
-              <div className="relative hidden md:block w-48 xl:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <div className="relative hidden md:block w-36 lg:w-44 xl:w-56 shrink-0">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 xl:w-4 xl:h-4 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="ค้นหาชื่อรางวัล, ผู้รับ..."
+                  placeholder="ค้นหารางวัล, ผู้รับ..."
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
                     if (activeView !== 'public' && setActiveView) setActiveView('public');
                   }}
-                  className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-100/80 hover:bg-slate-100 focus:bg-white border border-transparent focus:border-blue-400 rounded-lg outline-none transition-all"
+                  className="w-full pl-8 xl:pl-9 pr-3 py-1.5 text-xs bg-slate-100/80 hover:bg-slate-100 focus:bg-white border border-transparent focus:border-blue-400 rounded-xl outline-none transition-all"
                 />
               </div>
             )}
