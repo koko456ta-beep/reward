@@ -14,12 +14,12 @@ export interface CompressionResult {
  */
 export async function compressImage(
   file: File,
-  maxWidth: number = 1920,
-  maxHeight: number = 1920,
-  quality: number = 0.85
+  maxWidth: number = 1280,
+  maxHeight: number = 1280,
+  quality: number = 0.75
 ): Promise<CompressionResult> {
   return new Promise((resolve, reject) => {
-    // If file is PDF, return as is (PDFs don't compress via canvas)
+    // If file is PDF, return as is
     if (file.type === 'application/pdf') {
       const originalSize = file.size;
       const reader = new FileReader();
@@ -77,9 +77,16 @@ export async function compressImage(
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Convert to WebP if supported, fallback to JPEG
-        const outputMime = file.type === 'image/png' ? 'image/jpeg' : (file.type || 'image/jpeg');
-        const dataUrl = canvas.toDataURL(outputMime, quality);
+        // Standardize output to high-compression JPEG
+        const outputMime = 'image/jpeg';
+        let outputQuality = quality;
+        let dataUrl = canvas.toDataURL(outputMime, outputQuality);
+
+        // If still large (>300KB), reduce quality slightly to guarantee fits inside Firestore limit and localStorage
+        if (dataUrl.length > 400000) {
+          outputQuality = 0.65;
+          dataUrl = canvas.toDataURL(outputMime, outputQuality);
+        }
 
         canvas.toBlob(
           (blob) => {
@@ -88,7 +95,7 @@ export async function compressImage(
               return;
             }
 
-            const compressedFile = new File([blob], file.name, {
+            const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", {
               type: outputMime,
               lastModified: Date.now()
             });
@@ -108,7 +115,7 @@ export async function compressImage(
             });
           },
           outputMime,
-          quality
+          outputQuality
         );
       };
 

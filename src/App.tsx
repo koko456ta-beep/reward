@@ -228,7 +228,7 @@ export function App() {
     setIsAwardFormOpen(true);
   };
 
-  const handleSaveAwardSubmit = (awardData: Partial<Award>) => {
+  const handleSaveAwardSubmit = async (awardData: Partial<Award>) => {
     const isNew = !editingAward;
     const awardToSave: Award = {
       id: editingAward ? editingAward.id : 'award_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
@@ -249,7 +249,7 @@ export function App() {
       featured: awardData.featured || false,
       allowDownload: awardData.allowDownload !== false,
       tags: awardData.tags || [],
-      driveFolder: awardData.driveFolder,
+      driveFolder: awardData.driveFolder || 'ผลงานโรงเรียน/เกียรติบัตร',
       createdBy: currentUser ? currentUser.uid : 'system',
       createdByName: currentUser ? currentUser.displayName : 'ระบบ',
       createdAt: editingAward ? editingAward.createdAt : new Date().toISOString(),
@@ -257,11 +257,11 @@ export function App() {
       deleted: false
     };
 
-    saveAward(awardToSave);
+    await saveAward(awardToSave);
     setAwards(getAwards());
 
     // Log Activity
-    logActivity({
+    await logActivity({
       userId: currentUser?.uid || 'system',
       userName: currentUser?.displayName || 'เจ้าหน้าที่',
       userRole: currentUser?.role || 'academic_admin',
@@ -274,13 +274,13 @@ export function App() {
     setLogs(getActivityLogs());
   };
 
-  const handleDeleteAward = (awardId: string) => {
+  const handleDeleteAward = async (awardId: string) => {
     const target = awards.find(a => a.id === awardId);
-    deleteAward(awardId);
+    await deleteAward(awardId);
     setAwards(getAwards());
 
     if (target) {
-      logActivity({
+      await logActivity({
         userId: currentUser?.uid || 'system',
         userName: currentUser?.displayName || 'เจ้าหน้าที่',
         userRole: currentUser?.role || 'super_admin',
@@ -294,7 +294,7 @@ export function App() {
     }
   };
 
-  const handleToggleFeatured = (awardId: string) => {
+  const handleToggleFeatured = async (awardId: string) => {
     const target = awards.find(a => a.id === awardId);
     if (!target) return;
 
@@ -304,10 +304,10 @@ export function App() {
       updatedAt: new Date().toISOString()
     };
 
-    saveAward(updated);
+    await saveAward(updated);
     setAwards(getAwards());
 
-    logActivity({
+    await logActivity({
       userId: currentUser?.uid || 'system',
       userName: currentUser?.displayName || 'เจ้าหน้าที่',
       userRole: currentUser?.role || 'academic_admin',
@@ -320,7 +320,7 @@ export function App() {
     setLogs(getActivityLogs());
   };
 
-  const handleToggleStatus = (awardId: string, newStatus: AwardStatus) => {
+  const handleToggleStatus = async (awardId: string, newStatus: AwardStatus) => {
     const target = awards.find(a => a.id === awardId);
     if (!target) return;
 
@@ -330,10 +330,10 @@ export function App() {
       updatedAt: new Date().toISOString()
     };
 
-    saveAward(updated);
+    await saveAward(updated);
     setAwards(getAwards());
 
-    logActivity({
+    await logActivity({
       userId: currentUser?.uid || 'system',
       userName: currentUser?.displayName || 'เจ้าหน้าที่',
       userRole: currentUser?.role || 'super_admin',

@@ -24,7 +24,7 @@ import { compressImage, formatBytes, CompressionResult } from '../../lib/imageCo
 interface AwardFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (awardData: Partial<Award>) => void;
+  onSubmit: (awardData: Partial<Award>) => Promise<void> | void;
   initialAward?: Award | null;
   currentUser: AppUser;
 }
@@ -62,6 +62,7 @@ export const AwardFormModal: React.FC<AwardFormModalProps> = ({
   const [uploadStatusText, setUploadStatusText] = useState('');
   const [previewImageUrl, setPreviewImageUrl] = useState<string>('');
   const [isCompressing, setIsCompressing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   // Load existing award if editing
@@ -119,12 +120,12 @@ export const AwardFormModal: React.FC<AwardFormModalProps> = ({
     setUploadStatusText('กำลังประมวลผลและบีบอัดภาพ...');
 
     try {
-      const result = await compressImage(file, 1920, 1920, 0.85);
+      const result = await compressImage(file, 1280, 1280, 0.75);
       setCompressionResult(result);
       setPreviewImageUrl(result.dataUrl);
       setImageUrlInput(result.dataUrl);
       setUploadProgress(100);
-      setUploadStatusText('พร้อมบันทึกลงฐานข้อมูล Firebase Firestore');
+      setUploadStatusText('พร้อมบันทึกลงฐานข้อมูล Firebase Cloud');
     } catch (err) {
       console.error(err);
       setErrorMessage('การประมวลผลรูปภาพล้มเหลว กรุณาลองใหม่อีกครั้ง');
@@ -133,7 +134,7 @@ export const AwardFormModal: React.FC<AwardFormModalProps> = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
 
@@ -169,11 +170,20 @@ export const AwardFormModal: React.FC<AwardFormModalProps> = ({
       featured,
       allowDownload,
       tags,
+      driveFolder: initialAward?.driveFolder || 'ผลงานโรงเรียน/เกียรติบัตร',
       updatedAt: new Date().toISOString()
     };
 
-    onSubmit(awardPayload);
-    onClose();
+    setIsSubmitting(true);
+    try {
+      await onSubmit(awardPayload);
+      onClose();
+    } catch (err) {
+      console.error('Submit error:', err);
+      setErrorMessage('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -531,15 +541,24 @@ export const AwardFormModal: React.FC<AwardFormModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold transition-colors"
+              disabled={isSubmitting}
+              className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold transition-colors disabled:opacity-50"
             >
               ยกเลิก
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-md transition-all active:scale-95"
+              disabled={isSubmitting || isCompressing}
+              className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {initialAward ? 'บันทึกการแก้ไข' : 'บันทึกผลงานลง Firebase'}
+              {isSubmitting ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <span>กำลังบันทึกลง Cloud...</span>
+                </>
+              ) : (
+                <span>{initialAward ? 'บันทึกการแก้ไข' : 'บันทึกผลงานลง Firebase'}</span>
+              )}
             </button>
           </div>
         </form>

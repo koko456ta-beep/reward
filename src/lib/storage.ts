@@ -201,6 +201,21 @@ export function setStoredCurrentUser(user: AppUser | null): void {
   }
 }
 
+// Helper to sanitize objects before sending to Firestore (removes any undefined properties)
+export function sanitizeForFirestore<T extends Record<string, any>>(obj: T): T {
+  const result: any = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined) {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        result[key] = sanitizeForFirestore(value);
+      } else {
+        result[key] = value;
+      }
+    }
+  }
+  return result;
+}
+
 // -------------------------------------------------------------
 // Real-time Firestore Listeners & Cloud Sync
 // -------------------------------------------------------------
@@ -221,10 +236,10 @@ export function subscribeToAwards(onUpdate: (awards: Award[]) => void): () => vo
           const batch = writeBatch(db);
           for (const award of INITIAL_AWARDS) {
             const docRef = doc(db, 'awards', award.id);
-            batch.set(docRef, award);
+            batch.set(docRef, sanitizeForFirestore(award));
           }
           await batch.commit();
-          console.log('Seeded Firestore with initial awards data');
+          console.log('[Firestore] Seeded Firestore with initial awards data');
         } catch (seedErr) {
           handleFirestoreError(seedErr, OperationType.WRITE, 'awards');
         }
@@ -233,7 +248,10 @@ export function subscribeToAwards(onUpdate: (awards: Award[]) => void): () => vo
       } else {
         const loadedAwards: Award[] = [];
         snapshot.forEach((d) => {
-          loadedAwards.push(d.data() as Award);
+          const data = d.data() as Award;
+          if (data && data.id) {
+            loadedAwards.push(data);
+          }
         });
         saveStoredAwards(loadedAwards);
         onUpdate(loadedAwards);
@@ -355,32 +373,58 @@ export function subscribeToUsers(onUpdate: (users: AppUser[]) => void): () => vo
 // Database Mutations (Firestore + Local Sync)
 // -------------------------------------------------------------
 
-export async function saveAward(award: Award): Promise<void> {
+export async function saveAward(award: Award): Promise<boolean> {
+  const sanitizedAward: Award = {
+    ...award,
+    awardName: award.awardName || '',
+    recipientName: award.recipientName || '',
+    recipientType: award.recipientType || 'student',
+    department: award.department || 'academic',
+    level: award.level || 'national',
+    academicYear: award.academicYear || '2569',
+    awardDate: award.awardDate || new Date().toISOString().slice(0, 10),
+    description: award.description || '',
+    organizer: award.organizer || '',
+    certificateUrl: award.certificateUrl || award.imageUrl || '',
+    imageUrl: award.imageUrl || award.certificateUrl || '',
+    status: award.status || 'published',
+    featured: Boolean(award.featured),
+    allowDownload: award.allowDownload !== false,
+    tags: Array.isArray(award.tags) ? award.tags : [],
+    createdBy: award.createdBy || 'system',
+    createdByName: award.createdByName || 'ระบบ',
+    createdAt: award.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    deleted: Boolean(award.deleted)
+  };
+
   // Update local cache immediately for snappy UI
   const current = getStoredAwards();
-  const index = current.findIndex(a => a.id === award.id);
+  const index = current.findIndex(a => a.id === sanitizedAward.id);
   let updated: Award[];
   if (index >= 0) {
     updated = [...current];
-    updated[index] = award;
+    updated[index] = sanitizedAward;
   } else {
-    updated = [award, ...current];
+    updated = [sanitizedAward, ...current];
   }
   saveStoredAwards(updated);
 
   // Sync with Firestore Cloud Database
   try {
-    const docRef = doc(db, 'awards', award.id);
-    await setDoc(docRef, {
-      ...award,
-      updatedAt: new Date().toISOString()
-    }, { merge: true });
+    const docRef = doc(db, 'awards', sanitizedAward.id);
+    const firestoreData = sanitizeForFirestore(sanitizedAward);
+    await setDoc(docRef, firestoreData, { merge: true });
+    console.log(`[Firestore] Successfully saved award ${sanitizedAward.id}`);
+    return true;
   } catch (err) {
-    handleFirestoreError(err, OperationType.WRITE, `awards/${award.id}`);
+    handleFirestoreError(err, OperationType.WRITE, `awards/${sanitizedAward.id}`);
+    console.error(`[Firestore] Error saving award:`, err);
+    return false;
   }
 }
 
-export async function deleteAward(awardId: string): Promise<void> {
+export async function deleteAward(awardId: string): Promise<boolean> {
   const current = getStoredAwards();
   const updated = current.map(a => a.id === awardId ? { ...a, deleted: true, updatedAt: new Date().toISOString() } : a);
   saveStoredAwards(updated);
@@ -391,44 +435,53 @@ export async function deleteAward(awardId: string): Promise<void> {
       deleted: true,
       updatedAt: new Date().toISOString()
     });
+    return true;
   } catch (err) {
     handleFirestoreError(err, OperationType.UPDATE, `awards/${awardId}`);
+    return false;
   }
 }
 
-export async function saveSystemSettings(settings: SystemSettings): Promise<void> {
+export async function saveSystemSettings(settings: SystemSettings): Promise<boolean> {
+  const sanitized = sanitizeForFirestore(settings);
   saveStoredSettings(settings);
 
   try {
     const docRef = doc(db, 'settings', 'system');
-    await setDoc(docRef, settings, { merge: true });
+    await setDoc(docRef, sanitized, { merge: true });
+    return true;
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, 'settings/system');
+    return false;
   }
 }
 
-export async function saveUser(user: AppUser): Promise<void> {
+export async function saveUser(user: AppUser): Promise<boolean> {
   const current = getStoredUsers();
   saveStoredUsers([user, ...current]);
 
   try {
     const docRef = doc(db, 'users', user.uid);
-    await setDoc(docRef, user, { merge: true });
+    await setDoc(docRef, sanitizeForFirestore(user), { merge: true });
+    return true;
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, `users/${user.uid}`);
+    return false;
   }
 }
 
-export async function updateUser(user: AppUser): Promise<void> {
+export async function updateUser(user: AppUser): Promise<boolean> {
   const current = getStoredUsers();
   const updated = current.map(u => u.uid === user.uid ? user : u);
   saveStoredUsers(updated);
 
   try {
     const docRef = doc(db, 'users', user.uid);
-    await setDoc(docRef, user, { merge: true });
+    await setDoc(docRef, sanitizeForFirestore(user), { merge: true });
+    return true;
   } catch (err) {
     handleFirestoreError(err, OperationType.UPDATE, `users/${user.uid}`);
+    return false;
   }
 }
 
@@ -449,7 +502,6 @@ export async function logActivity(params: {
     ...params
   };
 
-  saveStoredAwards([...getStoredAwards()]); // trigger ensure
   try {
     localStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify([newLog, ...current]));
   } catch {
@@ -458,7 +510,7 @@ export async function logActivity(params: {
 
   try {
     const docRef = doc(db, 'activityLogs', newLog.id);
-    await setDoc(docRef, newLog);
+    await setDoc(docRef, sanitizeForFirestore(newLog));
   } catch (err) {
     handleFirestoreError(err, OperationType.CREATE, `activityLogs/${newLog.id}`);
   }
