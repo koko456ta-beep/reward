@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { SystemSettings } from '../types';
 import { DEPARTMENTS, INITIAL_SETTINGS } from '../data/mockData';
+import schoolBannerBg from '../assets/images/school_banner_bg_1788001743945.jpg';
 
 interface AboutViewProps {
   settings?: SystemSettings;
@@ -28,7 +29,14 @@ export const AboutView: React.FC<AboutViewProps> = ({ settings = INITIAL_SETTING
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       {/* Hero Intro */}
-      <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-xl">
+      <div className="bg-slate-950 text-white rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-xl border border-slate-800">
+        {/* Background Image with Layer */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30 transform scale-105"
+          style={{ backgroundImage: `url(${schoolBannerBg})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/80 to-slate-950/90 backdrop-blur-[1px]" />
+        
         <div className="relative z-10 max-w-3xl">
           <div className="flex items-center gap-3 mb-4">
             {safeSettings.schoolLogoUrl ? (

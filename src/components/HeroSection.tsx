@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { DepartmentId, SystemSettings, Award } from '../types';
 import { DEPARTMENTS } from '../data/mockData';
+import schoolBannerBg from '../assets/images/school_banner_bg_1788001743945.jpg';
 
 interface HeroSectionProps {
   settings: SystemSettings;
@@ -61,11 +62,19 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white pt-10 pb-16 sm:pt-14 sm:pb-20">
-      {/* Background Decorative Pattern & Glow */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:24px_24px]"></div>
-      <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+    <section className="relative overflow-hidden bg-slate-950 text-white pt-10 pb-16 sm:pt-14 sm:pb-20">
+      {/* School Background Image with Optimized Gradient Overlay */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat transform scale-105 filter blur-[1px] opacity-40 transition-transform duration-1000"
+        style={{ backgroundImage: `url(${schoolBannerBg})` }}
+      />
+      {/* Deep Navy/Slate Tint & Radial Glow for Maximum Legibility */}
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/85 via-slate-900/75 to-slate-950/95 backdrop-blur-[2px]" />
+      
+      {/* Background Decorative Pattern & Subtle Glow */}
+      <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:24px_24px]"></div>
+      <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-500/25 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto">
