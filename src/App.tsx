@@ -28,6 +28,8 @@ import { AwardCard } from './components/AwardCard';
 import { AwardDetailModal } from './components/AwardDetailModal';
 import { LoginModal } from './components/LoginModal';
 import { AboutView } from './components/AboutView';
+import { EPortfolioHub } from './components/EPortfolioHub';
+import { PublicReportsView } from './components/PublicReportsView';
 import { Footer } from './components/Footer';
 
 // Admin Components
@@ -49,7 +51,7 @@ export function App() {
   const [logs, setLogs] = useState<ActivityLog[]>([]);
 
   // Navigation & View States
-  const [currentView, setCurrentView] = useState<'public' | 'admin' | 'about'>('public');
+  const [currentView, setCurrentView] = useState<'public' | 'admin' | 'about' | 'portfolio' | 'reports'>('public');
   const [adminTab, setAdminTab] = useState<AdminTab>('dashboard');
 
   // Auth State
@@ -497,23 +499,56 @@ export function App() {
       {/* Navbar */}
       <Navbar
         settings={settings}
+        activeView={currentView}
+        setActiveView={setCurrentView}
         activeDepartment={filters.department}
         onSelectDepartment={handleSelectDepartment}
         onOpenLogin={() => setIsLoginModalOpen(true)}
         onGoToAbout={() => setCurrentView('about')}
+        onGoToPortfolio={() => setCurrentView('portfolio')}
+        onGoToReports={() => setCurrentView('reports')}
         currentUser={currentUser}
         onGoToAdmin={() => setCurrentView('admin')}
+        searchQuery={filters.search}
+        setSearchQuery={(q) => setFilters(prev => ({ ...prev, search: q }))}
       />
 
       {/* Main Content Area */}
       <main className="flex-1">
-        {currentView === 'about' ? (
+        {currentView === 'about' && (
           <AboutView settings={settings} />
-        ) : (
+        )}
+
+        {currentView === 'portfolio' && (
+          <div className="py-8">
+            <EPortfolioHub
+              awards={awards}
+              settings={settings}
+              onSelectAward={setSelectedAward}
+              onSelectDepartment={handleSelectDepartment}
+            />
+          </div>
+        )}
+
+        {currentView === 'reports' && (
+          <div className="py-8">
+            <PublicReportsView
+              awards={awards}
+              settings={settings}
+              onSelectDepartment={handleSelectDepartment}
+            />
+          </div>
+        )}
+
+        {currentView === 'public' && (
           <div className="space-y-12 pb-16">
             {/* Hero Section */}
             <HeroSection
               settings={settings}
+              awards={awards}
+              selectedDepartment={filters.department}
+              searchQuery={filters.search}
+              setSearchQuery={(q) => setFilters(prev => ({ ...prev, search: q }))}
               onExplore={() => {
                 const el = document.getElementById('awards-catalog-section');
                 el?.scrollIntoView({ behavior: 'smooth' });
@@ -584,8 +619,6 @@ export function App() {
                       key={award.id}
                       award={award}
                       onSelectAward={setSelectedAward}
-                      onSelectDepartment={handleSelectDepartment}
-                      onSelectLevel={handleSelectLevel}
                     />
                   ))}
                 </div>
@@ -601,6 +634,8 @@ export function App() {
         onSelectDepartment={handleSelectDepartment}
         onOpenLogin={() => setIsLoginModalOpen(true)}
         onGoToAbout={() => setCurrentView('about')}
+        onGoToPortfolio={() => setCurrentView('portfolio')}
+        onGoToReports={() => setCurrentView('reports')}
       />
 
       {/* Global Modals */}

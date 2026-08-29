@@ -23,8 +23,8 @@ import { DEPARTMENTS } from '../data/mockData';
 interface NavbarProps {
   currentUser: AppUser | null;
   settings: SystemSettings;
-  activeView?: 'public' | 'admin' | 'about';
-  setActiveView?: (view: 'public' | 'admin' | 'about') => void;
+  activeView?: 'public' | 'admin' | 'about' | 'portfolio' | 'reports';
+  setActiveView?: (view: 'public' | 'admin' | 'about' | 'portfolio' | 'reports') => void;
   selectedDepartment?: DepartmentId | 'all';
   setSelectedDepartment?: (dept: DepartmentId | 'all') => void;
   activeDepartment?: DepartmentId | 'all';
@@ -34,6 +34,8 @@ interface NavbarProps {
   onQuickSwitchUser?: (username: string) => void;
   onGoToAbout?: () => void;
   onGoToAdmin?: () => void;
+  onGoToPortfolio?: () => void;
+  onGoToReports?: () => void;
   searchQuery?: string;
   setSearchQuery?: (q: string) => void;
 }
@@ -52,6 +54,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onQuickSwitchUser,
   onGoToAbout,
   onGoToAdmin,
+  onGoToPortfolio,
+  onGoToReports,
   searchQuery = '',
   setSearchQuery
 }) => {
@@ -69,9 +73,11 @@ export const Navbar: React.FC<NavbarProps> = ({
     setMobileMenuOpen(false);
   };
 
-  const handleNavigateView = (view: 'public' | 'admin' | 'about') => {
+  const handleNavigateView = (view: 'public' | 'admin' | 'about' | 'portfolio' | 'reports') => {
     if (view === 'about' && onGoToAbout) onGoToAbout();
     else if (view === 'admin' && onGoToAdmin) onGoToAdmin();
+    else if (view === 'portfolio' && onGoToPortfolio) onGoToPortfolio();
+    else if (view === 'reports' && onGoToReports) onGoToReports();
     else if (setActiveView) setActiveView(view);
     setMobileMenuOpen(false);
     setUserDropdownOpen(false);
@@ -208,6 +214,30 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               )}
             </div>
+
+            <button
+              id="nav-portfolio-btn"
+              onClick={() => handleNavigateView('portfolio')}
+              className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeView === 'portfolio'
+                  ? 'bg-blue-50 text-blue-700 font-semibold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              แฟ้มสะสมงาน (E-Portfolio)
+            </button>
+
+            <button
+              id="nav-reports-btn"
+              onClick={() => handleNavigateView('reports')}
+              className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeView === 'reports'
+                  ? 'bg-blue-50 text-blue-700 font-semibold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              สถิติและรายงาน
+            </button>
 
             <button
               id="nav-about-btn"
@@ -412,6 +442,22 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               ))}
             </div>
+            <button
+              onClick={() => handleNavigateView('portfolio')}
+              className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium ${
+                activeView === 'portfolio' ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700'
+              }`}
+            >
+              แฟ้มสะสมงาน (E-Portfolio)
+            </button>
+            <button
+              onClick={() => handleNavigateView('reports')}
+              className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium ${
+                activeView === 'reports' ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700'
+              }`}
+            >
+              สถิติและรายงาน
+            </button>
             <button
               onClick={() => handleNavigateView('about')}
               className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium ${

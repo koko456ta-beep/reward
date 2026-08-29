@@ -8,13 +8,17 @@ interface FooterProps {
   onSelectDepartment?: (dept: DepartmentId | 'all') => void;
   onOpenLogin?: () => void;
   onGoToAbout?: () => void;
+  onGoToPortfolio?: () => void;
+  onGoToReports?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
   settings = INITIAL_SETTINGS,
   onSelectDepartment,
   onOpenLogin,
-  onGoToAbout
+  onGoToAbout,
+  onGoToPortfolio,
+  onGoToReports
 }) => {
   const safeSettings = settings || INITIAL_SETTINGS;
   return (
@@ -63,6 +67,16 @@ export const Footer: React.FC<FooterProps> = ({
               บริการและระบบ
             </p>
             <ul className="space-y-1.5">
+              <li>
+                <button onClick={onGoToPortfolio} className="hover:text-white transition-colors">
+                  แฟ้มสะสมงานดิจิทัล (E-Portfolio Hub)
+                </button>
+              </li>
+              <li>
+                <button onClick={onGoToReports} className="hover:text-white transition-colors">
+                  สถิติและรายงานสรุปผลงาน
+                </button>
+              </li>
               <li>
                 <button onClick={onGoToAbout} className="hover:text-white transition-colors">
                   เกี่ยวกับระบบและโครงสร้างฝ่าย

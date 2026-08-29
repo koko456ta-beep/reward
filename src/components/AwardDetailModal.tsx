@@ -238,15 +238,27 @@ export const AwardDetailModal: React.FC<AwardDetailModalProps> = ({
 
                 <div className="flex items-center gap-2">
                   {award.allowDownload !== false && (
-                    <a
-                      href={certificateImg}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>เปิดดูรูปภาพขนาดเต็ม</span>
-                    </a>
+                    <>
+                      <a
+                        href={certificateImg}
+                        download={`เกียรติบัตร_${(award.recipientName || 'ผลงาน').replace(/\s+/g, '_')}_${award.awardName.slice(0, 20)}.jpg`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-colors"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>ดาวน์โหลดเกียรติบัตร</span>
+                      </a>
+                      <a
+                        href={certificateImg}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>เปิดดูรูปขนาดเต็ม</span>
+                      </a>
+                    </>
                   )}
                 </div>
               </div>

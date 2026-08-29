@@ -1,7 +1,7 @@
 import React from 'react';
 import { Award } from '../types';
 import { DEPARTMENTS, AWARD_LEVELS } from '../data/mockData';
-import { Calendar, User, Eye, Star, Globe2, Sparkles, Building2, GraduationCap, Users, Coins } from 'lucide-react';
+import { Calendar, User, Eye, Star, Globe2, Sparkles, Building2, GraduationCap, Users, Coins, Download } from 'lucide-react';
 
 interface AwardCardProps {
   award: Award;
@@ -21,6 +21,21 @@ export const AwardCard: React.FC<AwardCardProps> = ({ award, onSelectAward }) =>
       case 'Coins': return <Coins className="w-3 h-3" />;
       default: return null;
     }
+  };
+
+  const handleDirectDownload = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const downloadUrl = award.certificateUrl || award.imageUrl;
+    if (!downloadUrl) return;
+
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `เกียรติบัตร_${(award.recipientName || 'ผลงาน').replace(/\s+/g, '_')}_${award.awardName.slice(0, 20)}.jpg`;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -48,8 +63,17 @@ export const AwardCard: React.FC<AwardCardProps> = ({ award, onSelectAward }) =>
           </span>
         </div>
 
-        {/* Academic Year Badge (Top Right) */}
-        <div className="absolute top-3 right-3 flex items-center gap-1">
+        {/* Academic Year Badge & Direct Download Button (Top Right) */}
+        <div className="absolute top-3 right-3 flex items-center gap-1.5">
+          {award.allowDownload !== false && (
+            <button
+              onClick={handleDirectDownload}
+              title="ดาวน์โหลดเกียรติบัตร / รูปผลงาน"
+              className="p-1.5 rounded-lg bg-black/60 hover:bg-blue-600 text-white backdrop-blur-xs transition-colors shadow-xs"
+            >
+              <Download className="w-3.5 h-3.5" />
+            </button>
+          )}
           {award.featured && (
             <span className="p-1 rounded-md bg-amber-500 text-white shadow-xs" title="ผลงานแนะนำ">
               <Star className="w-3 h-3 fill-white" />
@@ -97,16 +121,28 @@ export const AwardCard: React.FC<AwardCardProps> = ({ award, onSelectAward }) =>
           </p>
         </div>
 
-        {/* Card Footer */}
+        {/* Card Footer with Direct Action Buttons */}
         <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs text-slate-400">
             <Eye className="w-3.5 h-3.5" />
             <span>{award.viewsCount || 100} ครั้ง</span>
           </div>
 
-          <span className="text-xs font-semibold text-blue-600 group-hover:text-blue-800 flex items-center gap-1">
-            ดูเกียรติบัตร & รายละเอียด
-          </span>
+          <div className="flex items-center gap-1.5">
+            {award.allowDownload !== false && (
+              <button
+                onClick={handleDirectDownload}
+                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-medium flex items-center gap-1 transition-colors"
+                title="ดาวน์โหลดไฟล์เกียรติบัตร"
+              >
+                <Download className="w-3.5 h-3.5 text-blue-600" />
+                <span>ดาวน์โหลด</span>
+              </button>
+            )}
+            <span className="text-xs font-semibold text-blue-600 group-hover:text-blue-800 flex items-center gap-0.5 pl-1">
+              ดูรายละเอียด
+            </span>
+          </div>
         </div>
       </div>
     </div>
