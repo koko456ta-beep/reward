@@ -25,7 +25,9 @@ export const isFirebaseConfigured = Boolean(firebaseConfig.projectId);
 
 // Initialize Firebase safely
 export const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+export const db = appletConfig.firestoreDatabaseId 
+  ? getFirestore(app, appletConfig.firestoreDatabaseId) 
+  : getFirestore(app);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
 

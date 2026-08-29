@@ -1,0 +1,113 @@
+{
+  "entities": {
+    "Award": {
+      "title": "Award",
+      "description": "School awards, certificates, and achievements across 5 departments",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "awardName": { "type": "string" },
+        "recipientName": { "type": "string" },
+        "recipientType": { "type": "string" },
+        "department": { "type": "string" },
+        "level": { "type": "string" },
+        "academicYear": { "type": "string" },
+        "awardDate": { "type": "string" },
+        "description": { "type": "string" },
+        "organizer": { "type": "string" },
+        "certificateUrl": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "status": { "type": "string" },
+        "featured": { "type": "boolean" },
+        "allowDownload": { "type": "boolean" },
+        "tags": { "type": "array" },
+        "createdBy": { "type": "string" },
+        "createdByName": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "deleted": { "type": "boolean" },
+        "viewsCount": { "type": "number" }
+      },
+      "required": ["id", "awardName", "recipientName", "department", "level", "academicYear", "awardDate"]
+    },
+    "AppUser": {
+      "title": "AppUser",
+      "description": "Application user account with role and department assignment",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "username": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string" },
+        "department": { "type": "string" },
+        "status": { "type": "string" },
+        "avatarUrl": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "lastLogin": { "type": "string" },
+        "position": { "type": "string" }
+      },
+      "required": ["uid", "username", "displayName", "role", "department"]
+    },
+    "SystemSettings": {
+      "title": "SystemSettings",
+      "description": "School identity and system configuration",
+      "type": "object",
+      "properties": {
+        "schoolName": { "type": "string" },
+        "schoolMotto": { "type": "string" },
+        "schoolLogoUrl": { "type": "string" },
+        "schoolAddress": { "type": "string" },
+        "schoolPhone": { "type": "string" },
+        "schoolEmail": { "type": "string" },
+        "schoolWebsite": { "type": "string" },
+        "primaryColor": { "type": "string" },
+        "secondaryColor": { "type": "string" },
+        "accentColor": { "type": "string" },
+        "requireSuperAdminApproval": { "type": "boolean" },
+        "defaultAllowDownload": { "type": "boolean" },
+        "enableDemoLogin": { "type": "boolean" },
+        "enableHallOfFame": { "type": "boolean" },
+        "enableActivityLogging": { "type": "boolean" },
+        "itemsPerPage": { "type": "number" }
+      },
+      "required": ["schoolName"]
+    },
+    "ActivityLog": {
+      "title": "ActivityLog",
+      "description": "Audit trail log of actions in the system",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userRole": { "type": "string" },
+        "department": { "type": "string" },
+        "action": { "type": "string" },
+        "recordId": { "type": "string" },
+        "recordTitle": { "type": "string" },
+        "details": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "userId", "action", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/awards/{awardId}": {
+      "schema": "Award",
+      "description": "Individual award records"
+    },
+    "/users/{userId}": {
+      "schema": "AppUser",
+      "description": "User profiles and credentials"
+    },
+    "/settings/{settingId}": {
+      "schema": "SystemSettings",
+      "description": "Global system configurations"
+    },
+    "/activityLogs/{logId}": {
+      "schema": "ActivityLog",
+      "description": "Activity audit logs"
+    }
+  }
+}
