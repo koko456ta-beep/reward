@@ -1,0 +1,8 @@
+{
+  "name": "สำรอง ระบบจัดเก็บผลงานและรางวัลของโรงเรียน",
+  "description": "ระบบจัดเก็บและเผยแพร่ผลงาน รางวัล และเกียรติบัตรของโรงเรียน แยกตาม 5 ฝ่ายหลัก พร้อมแดชบอร์ด จัดการผู้ใช้ และเชื่อมต่อ Google Drive",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

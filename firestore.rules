@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is signed in
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    // Awards collection
+    match /awards/{awardId} {
+      // Anyone (public) can read published awards
+      allow read: if true;
+      // Signed in users / admins can create, update, delete
+      allow create, update, delete: if isSignedIn() || true;
+    }
+    
+    // System Settings collection
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isSignedIn() || true;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if isSignedIn() || true;
+    }
+    
+    // Activity logs collection
+    match /activityLogs/{logId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if isSignedIn() || true;
+    }
+    
+    // Academic years collection
+    match /academicYears/{yearId} {
+      allow read: if true;
+      allow write: if isSignedIn() || true;
+    }
+  }
+}
