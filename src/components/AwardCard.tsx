@@ -1,7 +1,8 @@
 import React from 'react';
 import { Award } from '../types';
 import { DEPARTMENTS, AWARD_LEVELS } from '../data/mockData';
-import { Calendar, User, Eye, Star, Globe2, Sparkles, Building2, GraduationCap, Users, Coins, Download } from 'lucide-react';
+import { Calendar, User, Eye, Star, Globe2, Sparkles, Building2, GraduationCap, Users, Coins, Download, Loader2 } from 'lucide-react';
+import { downloadAwardImage } from '../lib/exportUtils';
 
 interface AwardCardProps {
   award: Award;
@@ -11,6 +12,7 @@ interface AwardCardProps {
 export const AwardCard: React.FC<AwardCardProps> = ({ award, onSelectAward }) => {
   const dept = DEPARTMENTS[award.department];
   const levelInfo = AWARD_LEVELS[award.level];
+  const [downloading, setDownloading] = React.useState(false);
 
   const getDeptIcon = (iconName?: string) => {
     switch (iconName) {
@@ -23,19 +25,19 @@ export const AwardCard: React.FC<AwardCardProps> = ({ award, onSelectAward }) =>
     }
   };
 
-  const handleDirectDownload = (e: React.MouseEvent) => {
+  const handleDirectDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
     const downloadUrl = award.certificateUrl || award.imageUrl;
     if (!downloadUrl) return;
 
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = `เกียรติบัตร_${(award.recipientName || 'ผลงาน').replace(/\s+/g, '_')}_${award.awardName.slice(0, 20)}.jpg`;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      setDownloading(true);
+      const safeName = (award.recipientName || 'ผลงาน').replace(/\s+/g, '_');
+      const safeTitle = (award.awardName || 'เกียรติบัตร').replace(/\s+/g, '_').slice(0, 30);
+      await downloadAwardImage(downloadUrl, `เกียรติบัตร_${safeName}_${safeTitle}.jpg`);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
@@ -68,10 +70,11 @@ export const AwardCard: React.FC<AwardCardProps> = ({ award, onSelectAward }) =>
           {award.allowDownload !== false && (
             <button
               onClick={handleDirectDownload}
+              disabled={downloading}
               title="ดาวน์โหลดเกียรติบัตร / รูปผลงาน"
-              className="p-1.5 rounded-lg bg-black/60 hover:bg-blue-600 text-white backdrop-blur-xs transition-colors shadow-xs"
+              className="p-1.5 rounded-lg bg-black/60 hover:bg-blue-600 text-white backdrop-blur-xs transition-colors shadow-xs flex items-center justify-center"
             >
-              <Download className="w-3.5 h-3.5" />
+              {downloading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-200" /> : <Download className="w-3.5 h-3.5" />}
             </button>
           )}
           {award.featured && (

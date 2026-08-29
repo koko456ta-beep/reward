@@ -16,11 +16,12 @@ import {
   ChevronRight,
   RotateCcw,
   AlertTriangle,
-  HardDrive
+  Download,
+  Image as ImageIcon
 } from 'lucide-react';
 import { Award, AppUser, DepartmentId, AwardLevel, AwardStatus } from '../../types';
 import { DEPARTMENTS, AWARD_LEVELS } from '../../data/mockData';
-import { exportAwardsToCSV } from '../../lib/exportUtils';
+import { exportAwardsToCSV, downloadAwardImage } from '../../lib/exportUtils';
 
 interface AwardsTableProps {
   currentUser: AppUser;
@@ -243,7 +244,7 @@ export const AwardsTable: React.FC<AwardsTableProps> = ({
                 <th className="py-3 px-4">ระดับ</th>
                 <th className="py-3 px-4">ปีการศึกษา</th>
                 <th className="py-3 px-4">สถานะ</th>
-                <th className="py-3 px-4 text-center">Google Drive</th>
+                <th className="py-3 px-4 text-center">ภาพเกียรติบัตร</th>
                 <th className="py-3 px-4 text-right">จัดการ</th>
               </tr>
             </thead>
@@ -328,18 +329,22 @@ export const AwardsTable: React.FC<AwardsTableProps> = ({
                         </button>
                       </td>
 
-                      {/* Drive Link */}
+                      {/* Certificate Image Download */}
                       <td className="py-3.5 px-4 text-center">
-                        <a
-                          href={award.certificateUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 hover:underline"
-                          title="เปิดไฟล์ใน Google Drive"
+                        <button
+                          onClick={async () => {
+                            const url = award.certificateUrl || award.imageUrl;
+                            if (!url) return;
+                            const safeName = (award.recipientName || 'ผลงาน').replace(/\s+/g, '_');
+                            const safeTitle = (award.awardName || 'เกียรติบัตร').replace(/\s+/g, '_').slice(0, 30);
+                            await downloadAwardImage(url, `เกียรติบัตร_${safeName}_${safeTitle}.jpg`);
+                          }}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-medium transition-colors"
+                          title="ดาวน์โหลดภาพเกียรติบัตร"
                         >
-                          <HardDrive className="w-3.5 h-3.5 text-blue-500" />
-                          <span className="hidden xl:inline">Drive</span>
-                        </a>
+                          <Download className="w-3.5 h-3.5 text-blue-600" />
+                          <span className="hidden xl:inline">ดาวน์โหลด</span>
+                        </button>
                       </td>
 
                       {/* Action Buttons */}

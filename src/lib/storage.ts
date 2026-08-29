@@ -78,7 +78,26 @@ export function getStoredAwards(): Award[] {
       return INITIAL_AWARDS;
     }
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      // Clean any legacy Google Drive URLs from existing client localStorage
+      const cleaned = parsed.map((a: Award) => {
+        let cert = a.certificateUrl || a.imageUrl || '';
+        let img = a.imageUrl || a.certificateUrl || '';
+        if (cert.includes('drive.google.com')) {
+          cert = img.includes('drive.google.com') ? 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=1200&auto=format&fit=crop&q=85' : img;
+        }
+        if (img.includes('drive.google.com')) {
+          img = cert.includes('drive.google.com') ? 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=1200&auto=format&fit=crop&q=85' : cert;
+        }
+        return {
+          ...a,
+          certificateUrl: cert,
+          imageUrl: img,
+          allowDownload: a.allowDownload !== false
+        };
+      });
+      return cleaned;
+    }
     return INITIAL_AWARDS;
   } catch {
     return INITIAL_AWARDS;

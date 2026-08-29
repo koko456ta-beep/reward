@@ -17,8 +17,7 @@ import {
   Sparkles,
   Building2,
   GraduationCap,
-  Coins,
-  HardDrive
+  Coins
 } from 'lucide-react';
 import { AppUser, DepartmentId, SystemSettings } from '../../types';
 import { DEPARTMENTS, INITIAL_SETTINGS } from '../../data/mockData';

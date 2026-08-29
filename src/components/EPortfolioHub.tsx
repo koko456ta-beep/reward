@@ -17,10 +17,12 @@ import {
   Coins,
   Filter,
   Layers,
-  CheckCircle2
+  CheckCircle2,
+  Loader2
 } from 'lucide-react';
 import { Award, DepartmentId, SystemSettings } from '../types';
 import { DEPARTMENTS, AWARD_LEVELS, INITIAL_SETTINGS } from '../data/mockData';
+import { downloadAwardImage } from '../lib/exportUtils';
 
 interface EPortfolioHubProps {
   awards: Award[];
@@ -428,17 +430,20 @@ export const EPortfolioHub: React.FC<EPortfolioHubProps> = ({
                             <span>ดูเกียรติบัตร</span>
                           </button>
                           {award.allowDownload !== false && (
-                            <a
-                              href={award.certificateUrl || award.imageUrl}
-                              download={`เกียรติบัตร_${award.awardName.slice(0, 20)}.jpg`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
+                            <button
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                const imgUrl = award.certificateUrl || award.imageUrl;
+                                if (!imgUrl) return;
+                                const safeName = (award.recipientName || 'ผลงาน').replace(/\s+/g, '_');
+                                const safeTitle = (award.awardName || 'เกียรติบัตร').replace(/\s+/g, '_').slice(0, 30);
+                                await downloadAwardImage(imgUrl, `เกียรติบัตร_${safeName}_${safeTitle}.jpg`);
+                              }}
                               className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
-                              title="ดาวน์โหลดไฟล์ภาพ"
+                              title="ดาวน์โหลดภาพเกียรติบัตร"
                             >
                               <Download className="w-3.5 h-3.5" />
-                            </a>
+                            </button>
                           )}
                         </div>
                       </div>

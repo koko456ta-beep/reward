@@ -429,7 +429,7 @@ export function App() {
         {adminTab === 'add_award' && (
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-xs max-w-4xl">
             <h2 className="text-xl font-bold text-slate-900 mb-2">บันทึกผลงานรางวัลใหม่</h2>
-            <p className="text-xs text-slate-500 mb-6">กรอกข้อมูลและอัปโหลดไฟล์เกียรติบัตรไปยัง Google Drive</p>
+            <p className="text-xs text-slate-500 mb-6">กรอกข้อมูลและอัปโหลดไฟล์ภาพเกียรติบัตรเข้าสู่ระบบคลังผลงาน</p>
             <button
               onClick={handleOpenAddAward}
               className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow-md"

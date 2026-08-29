@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Shield, Heart, HardDrive, ExternalLink } from 'lucide-react';
+import { Trophy, Shield, Heart, Award, ExternalLink, Image } from 'lucide-react';
 import { SystemSettings, DepartmentId } from '../types';
 import { DEPARTMENTS, INITIAL_SETTINGS } from '../data/mockData';
 
@@ -34,7 +34,7 @@ export const Footer: React.FC<FooterProps> = ({
               <span>{safeSettings.schoolName}</span>
             </div>
             <p className="text-slate-400 text-xs leading-relaxed">
-              ระบบจัดเก็บและเผยแพร่ผลงาน/รางวัลของโรงเรียน แยกตาม 5 ฝ่ายหลักอย่างเป็นระบบ ปลอดภัย และเชื่อมต่อคลาวด์ Google Drive
+              ระบบจัดเก็บและเผยแพร่ผลงาน/รางวัลของโรงเรียน แยกตาม 5 ฝ่ายหลักอย่างเป็นระบบ ปลอดภัย และดาวน์โหลดเกียรติบัตรได้โดยตรง
             </p>
             <div className="pt-2 text-[11px] text-slate-500">
               {safeSettings.schoolAddress}
@@ -88,8 +88,8 @@ export const Footer: React.FC<FooterProps> = ({
                 </button>
               </li>
               <li className="flex items-center gap-1.5 text-slate-400">
-                <HardDrive className="w-3.5 h-3.5 text-blue-400" />
-                <span>Google Drive Storage Integration</span>
+                <Image className="w-3.5 h-3.5 text-blue-400" />
+                <span>คลังภาพและเกียรติบัตรดิจิทัลความละเอียดสูง</span>
               </li>
               <li className="flex items-center gap-1.5 text-slate-400">
                 <Shield className="w-3.5 h-3.5 text-emerald-400" />
@@ -119,9 +119,9 @@ export const Footer: React.FC<FooterProps> = ({
         <div className="pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500">
           <p>© {new Date().getFullYear()} {safeSettings.schoolName}. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <span>ระบบจัดเก็บผลงานและรางวัลของโรงเรียน v2.5</span>
+            <span>ระบบจัดเก็บผลงานและรางวัลของโรงเรียน</span>
             <span>•</span>
-            <span>Google Drive & Firebase Ready</span>
+            <span>คลังข้อมูลดิจิทัลพร้อมดาวน์โหลด</span>
           </div>
         </div>
       </div>

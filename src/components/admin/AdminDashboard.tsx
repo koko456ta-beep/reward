@@ -222,8 +222,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {DEPARTMENTS[currentUser.department]?.description}
               </p>
               <div className="p-3 bg-blue-50/70 border border-blue-100 rounded-2xl text-xs text-blue-900 space-y-1">
-                <p className="font-semibold">โฟลเดอร์ Google Drive ประจำฝ่าย:</p>
-                <p className="font-mono text-[11px] text-blue-700">ผลงานโรงเรียน/{DEPARTMENTS[currentUser.department]?.shortName}/เกียรติบัตร</p>
+                <p className="font-semibold">หมวดหมู่ระบบคลังผลงาน:</p>
+                <p className="font-medium text-[11px] text-blue-700">ฝ่าย{DEPARTMENTS[currentUser.department]?.name} (คลังเกียรติบัตรและผลงานดิจิทัล)</p>
               </div>
             </div>
 

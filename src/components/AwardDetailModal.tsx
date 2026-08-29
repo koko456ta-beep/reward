@@ -19,12 +19,14 @@ import {
   Tag, 
   ShieldCheck,
   Eye,
-  Info
+  Info,
+  Loader2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import QRCode from 'qrcode';
 import { Award, SystemSettings, DepartmentId } from '../types';
 import { DEPARTMENTS, AWARD_LEVELS, INITIAL_SETTINGS } from '../data/mockData';
+import { downloadAwardImage } from '../lib/exportUtils';
 
 interface AwardDetailModalProps {
   award: Award | null;
@@ -45,6 +47,7 @@ export const AwardDetailModal: React.FC<AwardDetailModalProps> = ({
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
   const [copiedLink, setCopiedLink] = useState(false);
   const [activeTab, setActiveTab] = useState<'certificate' | 'details' | 'qr'>('certificate');
+  const [downloading, setDownloading] = useState(false);
 
   // Trigger celebratory confetti on high-level achievements
   useEffect(() => {
@@ -239,25 +242,23 @@ export const AwardDetailModal: React.FC<AwardDetailModalProps> = ({
                 <div className="flex items-center gap-2">
                   {award.allowDownload !== false && (
                     <>
-                      <a
-                        href={certificateImg}
-                        download={`เกียรติบัตร_${(award.recipientName || 'ผลงาน').replace(/\s+/g, '_')}_${award.awardName.slice(0, 20)}.jpg`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-colors"
+                      <button
+                        onClick={async () => {
+                          try {
+                            setDownloading(true);
+                            const safeName = (award.recipientName || 'ผลงาน').replace(/\s+/g, '_');
+                            const safeTitle = (award.awardName || 'เกียรติบัตร').replace(/\s+/g, '_').slice(0, 30);
+                            await downloadAwardImage(certificateImg, `เกียรติบัตร_${safeName}_${safeTitle}.jpg`);
+                          } finally {
+                            setDownloading(false);
+                          }
+                        }}
+                        disabled={downloading}
+                        className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-semibold shadow-xs transition-colors"
                       >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>ดาวน์โหลดเกียรติบัตร</span>
-                      </a>
-                      <a
-                        href={certificateImg}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        <span>เปิดดูรูปขนาดเต็ม</span>
-                      </a>
+                        {downloading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+                        <span>ดาวน์โหลดภาพเกียรติบัตร</span>
+                      </button>
                     </>
                   )}
                 </div>
