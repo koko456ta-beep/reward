@@ -123,13 +123,13 @@ export const AWARD_LEVELS: Record<string, AwardLevelInfo> = {
 };
 
 export const INITIAL_SETTINGS: SystemSettings = {
-  schoolName: 'โรงเรียนสาธิตรัตนโกสินทร์วิทยาคม',
-  schoolMotto: 'ปัญญาประดุจดังแสงสว่าง สู่ความสำเร็จและเกียรติภูมิแห่งสากล',
+  schoolName: 'โรงเรียนศึกษาพิเศษชัยนาท',
+  schoolMotto: 'ไม่ว่าหนูจะเป็นใคร ทุกข์ร้อนมาจากไหน เมื่อเข้ามาอยู่บ้านหลังนี้ หนูจะอบอุ่นและปลอดภัย',
   schoolLogoUrl: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=160&auto=format&fit=crop&q=80',
-  schoolAddress: 'เลขที่ 99 ถนนวิทยพิทยา ตำบลในเมือง อำเภอเมือง จังหวัดนครปฐม 73000',
-  schoolPhone: '02-123-4567, 034-987-654',
-  schoolEmail: 'contact@rattanakosin.ac.th',
-  schoolWebsite: 'https://www.rattanakosin.ac.th',
+  schoolAddress: 'เลขที่ 111 หมู่ 4 ตำบลชัยนาท อำเภอเมืองชัยนาท จังหวัดชัยนาท 17000',
+  schoolPhone: '056-411-234, 056-411-567',
+  schoolEmail: 'contact@chainatspecial.ac.th',
+  schoolWebsite: 'https://www.chainatspecial.ac.th',
   primaryColor: '#1e3a8a', // Deep royal navy
   secondaryColor: '#f59e0b', // Warm Gold
   accentColor: '#10b981', // Emerald
@@ -593,6 +593,29 @@ export const INITIAL_AWARDS: Award[] = [
     updatedAt: '2026-08-04T13:45:00Z',
     driveFolder: 'ผลงานโรงเรียน/วิชาการ/เกียรติบัตร',
     viewsCount: 1120
+  },
+  {
+    id: 'award-015',
+    awardName: 'ผ่านการเรียนรายวิชา การประเมินสัญญาณชีพ (Vital Signs Assessment)',
+    recipientName: 'นายสัญญาณท์ ศรีไสล (นักเรียนชั้น ม.6)',
+    recipientType: 'student',
+    department: 'academic',
+    level: 'national',
+    academicYear: '2569',
+    awardDate: '2026-08-29',
+    description: 'ผ่านการอบรมและได้รับเกียรติบัตรการประเมินสัญญาณชีพ จากระบบการเรียนรู้ออนไลน์ มหาวิทยาลัยเกษตรศาสตร์ (KUMOOC)',
+    organizer: 'มหาวิทยาลัยเกษตรศาสตร์ (KUMOOC)',
+    certificateUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=80',
+    status: 'published',
+    featured: true,
+    allowDownload: true,
+    tags: ['วิทยาศาสตร์สุขภาพ', 'KUMOOC', 'ระดับชาติ', 'ม.เกษตร'],
+    createdBy: 'usr_academic_admin',
+    createdByName: 'อ.พรทิพย์ รัตนวิชัย (Admin ฝ่ายวิชาการ)',
+    createdAt: '2026-08-29T08:00:00Z',
+    updatedAt: '2026-08-29T08:00:00Z',
+    viewsCount: 250
   }
 ];
 
