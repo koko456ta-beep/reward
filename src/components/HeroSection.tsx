@@ -71,7 +71,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <div className="text-center max-w-3xl mx-auto">
           {/* School Badge Pill */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/80 text-amber-400 text-xs sm:text-sm font-medium shadow-inner mb-6 backdrop-blur-xs">
-            <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
+            {settings?.schoolLogoUrl ? (
+              <img
+                src={settings.schoolLogoUrl}
+                alt={settings.schoolName || 'School Logo'}
+                className="w-5 h-5 object-contain rounded shrink-0 bg-white/10 p-0.5"
+              />
+            ) : (
+              <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
+            )}
             <span className="text-slate-200">{settings?.schoolName || 'โรงเรียน'}</span>
             <span className="w-1 h-1 rounded-full bg-slate-500"></span>
             <span className="text-amber-400 font-semibold">Digital Award Archives</span>

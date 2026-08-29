@@ -30,9 +30,27 @@ export const AboutView: React.FC<AboutViewProps> = ({ settings = INITIAL_SETTING
       {/* Hero Intro */}
       <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-xl">
         <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold mb-4 border border-blue-400/30">
-            <Trophy className="w-3.5 h-3.5 text-amber-400" />
-            <span>ระบบจัดเก็บผลงานและรางวัลของโรงเรียน</span>
+          <div className="flex items-center gap-3 mb-4">
+            {safeSettings.schoolLogoUrl ? (
+              <div className="w-12 h-12 rounded-2xl bg-white p-1.5 shadow-md shrink-0 flex items-center justify-center">
+                <img
+                  src={safeSettings.schoolLogoUrl}
+                  alt={safeSettings.schoolName}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold border border-blue-400/30">
+                <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                <span>ระบบจัดเก็บผลงานและรางวัลของโรงเรียน</span>
+              </div>
+            )}
+            {safeSettings.schoolLogoUrl && (
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold border border-blue-400/30">
+                <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                <span>ระบบจัดเก็บผลงานและรางวัลของโรงเรียน</span>
+              </div>
+            )}
           </div>
           <h1 className="text-2xl sm:text-4xl font-bold tracking-tight leading-snug">
             {safeSettings.schoolName}
@@ -47,7 +65,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ settings = INITIAL_SETTING
             </div>
             <div className="flex items-center gap-2 text-slate-300">
               <HardDrive className="w-4 h-4 text-blue-400" />
-              <span>จัดเก็บไฟล์บน Google Drive โครงสร้างแยกฝ่าย</span>
+              <span>จัดเก็บบนคลาวด์ Firebase Firestore Real-time</span>
             </div>
             <div className="flex items-center gap-2 text-slate-300">
               <QrCode className="w-4 h-4 text-amber-400" />
@@ -94,7 +112,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ settings = INITIAL_SETTING
 
               <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>โฟลเดอร์ Drive: ผลงานโรงเรียน/{dept.shortName}/เกียรติบัตร</span>
+                <span>ฐานข้อมูล: Firebase Firestore / awards ({dept.shortName})</span>
               </div>
             </div>
           ))}

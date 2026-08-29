@@ -237,15 +237,17 @@ export const AwardDetailModal: React.FC<AwardDetailModalProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <a
-                    href={award.certificateUrl || '#'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    <span>เปิดใน Google Drive</span>
-                  </a>
+                  {award.allowDownload !== false && (
+                    <a
+                      href={certificateImg}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>เปิดดูรูปภาพขนาดเต็ม</span>
+                    </a>
+                  )}
                 </div>
               </div>
 
@@ -335,13 +337,14 @@ export const AwardDetailModal: React.FC<AwardDetailModalProps> = ({
 
                 <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-3">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    ข้อมูลระบบและการจัดเก็บ Google Drive
+                    ข้อมูลระบบและฐานข้อมูล Firebase
                   </h4>
                   <div className="space-y-2 text-sm">
                     <div>
-                      <p className="text-xs text-slate-500">Google Drive Folder</p>
-                      <p className="font-mono text-xs text-slate-700 bg-white p-1.5 rounded border border-slate-200">
-                        {award.driveFolder || `ผลงานโรงเรียน/${dept?.shortName}/เกียรติบัตร`}
+                      <p className="text-xs text-slate-500">ฐานข้อมูลจัดเก็บ (Cloud Database)</p>
+                      <p className="font-mono text-xs text-emerald-800 bg-emerald-50 p-1.5 rounded border border-emerald-200 flex items-center justify-between">
+                        <span>Firebase Firestore / awards</span>
+                        <span className="text-[10px] font-bold text-emerald-600">● Realtime Sync</span>
                       </p>
                     </div>
                     <div>

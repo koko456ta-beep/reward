@@ -107,7 +107,7 @@ export interface SystemSettings {
   accentColor: string;
   requireSuperAdminApproval: boolean;
   defaultAllowDownload: boolean;
-  driveRootFolderName: string;
+  enableDemoLogin: boolean; // Toggle One-Click Demo login
   enableHallOfFame: boolean;
   enableActivityLogging: boolean;
   itemsPerPage: number;

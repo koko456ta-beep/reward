@@ -7,24 +7,24 @@ import {
   Upload, 
   Check, 
   Building2, 
-  HardDrive, 
+  Database, 
   Palette, 
   ShieldCheck, 
   AlertTriangle,
   FileJson,
-  FolderTree,
-  FolderPlus,
-  ExternalLink
+  Layers,
+  Image as ImageIcon,
+  CheckCircle2,
+  Lock,
+  Flame,
+  Globe,
+  Trash2
 } from 'lucide-react';
 import { SystemSettings, Award } from '../../types';
 import { exportFullBackupJSON } from '../../lib/exportUtils';
 import { resetToFactoryDefault } from '../../lib/storage';
 import { INITIAL_SETTINGS, DEPARTMENTS } from '../../data/mockData';
-import { 
-  get5DepartmentsFolderStructure, 
-  createReal5DepartmentFoldersOnDrive,
-  ProvisionedDriveStructure
-} from '../../lib/googleDrive';
+import { isFirebaseConfigured } from '../../lib/firebase';
 
 interface SystemSettingsViewProps {
   settings?: SystemSettings;
@@ -40,22 +40,11 @@ export const SystemSettingsView: React.FC<SystemSettingsViewProps> = ({
   const [formData, setFormData] = useState<SystemSettings>(settings || INITIAL_SETTINGS);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
-  const [provisioningDrive, setProvisioningDrive] = useState(false);
-  const [driveProgressText, setDriveProgressText] = useState('');
-  const [driveProvisionResult, setDriveProvisionResult] = useState<ProvisionedDriveStructure | null>(null);
-  const [driveError, setDriveError] = useState<string | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
 
   React.useEffect(() => {
     if (settings) {
       setFormData(settings);
-    }
-    try {
-      const cached = localStorage.getItem('school_awards_drive_structure');
-      if (cached) {
-        setDriveProvisionResult(JSON.parse(cached));
-      }
-    } catch {
-      // ignore
     }
   }, [settings]);
 
@@ -64,6 +53,47 @@ export const SystemSettingsView: React.FC<SystemSettingsViewProps> = ({
     onSaveSettings(formData);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
+  };
+
+  const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLogoUploading(true);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 320;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL('image/png', 0.9);
+          setFormData(prev => ({ ...prev, schoolLogoUrl: compressedDataUrl }));
+        }
+        setLogoUploading(false);
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleExportBackup = () => {
@@ -93,7 +123,7 @@ export const SystemSettingsView: React.FC<SystemSettingsViewProps> = ({
             </span>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            ปรับแต่งข้อมูลเอกลักษณ์สถานศึกษา การเชื่อมต่อ Google Drive และนโยบายความปลอดภัย
+            ปรับแต่งข้อมูลเอกลักษณ์สถานศึกษา โลโก้โรงเรียน การเข้าใช้งาน และฐานข้อมูล Firebase
           </p>
         </div>
 
@@ -106,14 +136,84 @@ export const SystemSettingsView: React.FC<SystemSettingsViewProps> = ({
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
-        {/* SECTION 1: School Identity */}
+        {/* SECTION 1: School Identity & Logo */}
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
           <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
             <Building2 className="w-4 h-4 text-blue-600" />
-            <span>1. ข้อมูลอัตลักษณ์สถานศึกษา (School Branding)</span>
+            <span>1. ข้อมูลอัตลักษณ์และตราสัญลักษณ์โรงเรียน (School Identity & Logo)</span>
           </h3>
 
-          <div className="space-y-3.5">
+          {/* School Logo Section */}
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+            <label className="block text-xs font-bold text-slate-800">
+              ตราสัญลักษณ์ / โลโก้โรงเรียน (School Logo)
+            </label>
+            
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              {/* Logo Preview */}
+              <div className="w-24 h-24 rounded-2xl bg-white border-2 border-dashed border-slate-300 p-2 flex items-center justify-center relative overflow-hidden shadow-xs shrink-0">
+                {formData.schoolLogoUrl ? (
+                  <img
+                    src={formData.schoolLogoUrl}
+                    alt="School Logo"
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="text-center text-slate-400">
+                    <ImageIcon className="w-8 h-8 mx-auto mb-1 opacity-50" />
+                    <span className="text-[10px]">ไม่มีโลโก้</span>
+                  </div>
+                )}
+                {logoUploading && (
+                  <div className="absolute inset-0 bg-white/80 flex items-center justify-center">
+                    <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+              </div>
+
+              {/* Upload Controls */}
+              <div className="flex-1 w-full space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors">
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>อัปโหลดรูปภาพตราโรงเรียน (PNG/JPG)</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoFileChange}
+                      className="hidden"
+                    />
+                  </label>
+
+                  {formData.schoolLogoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, schoolLogoUrl: '' })}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-200 hover:bg-red-100 hover:text-red-700 text-slate-700 rounded-xl text-xs font-semibold transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>ลบโลโก้</span>
+                    </button>
+                  )}
+                </div>
+
+                <div>
+                  <input
+                    type="url"
+                    placeholder="หรือวางลิงก์ URL ของรูปภาพโลโก้ เช่น https://example.com/logo.png"
+                    value={formData.schoolLogoUrl}
+                    onChange={(e) => setFormData({ ...formData, schoolLogoUrl: e.target.value })}
+                    className="w-full px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-xl outline-none focus:border-blue-500 font-mono"
+                  />
+                  <p className="text-[10px] text-slate-500 mt-1">
+                    โลโก้นี้จะแสดงที่แถบเมนูด้านบน (Navbar), หน้าปก (Hero), หน้าเกี่ยวกับ และเอกสารรายงาน
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3.5 pt-2">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 ชื่อสถานศึกษา / โรงเรียน
@@ -179,165 +279,98 @@ export const SystemSettingsView: React.FC<SystemSettingsViewProps> = ({
           </div>
         </div>
 
-        {/* SECTION 2: Google Drive & System Policies */}
+        {/* SECTION 2: Firebase Firestore Database & Access Permissions */}
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
           <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-            <HardDrive className="w-4 h-4 text-emerald-600" />
-            <span>2. การจัดเก็บ Google Drive และนโยบายระบบ</span>
+            <Database className="w-4 h-4 text-emerald-600" />
+            <span>2. ฐานข้อมูล Firebase และสิทธิ์การเข้าใช้งาน (Firebase Database & Access)</span>
           </h3>
 
           <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                ชื่อโฟลเดอร์หลักบน Google Drive (Root Folder Name)
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={formData.driveRootFolderName}
-                  onChange={(e) => setFormData({ ...formData, driveRootFolderName: e.target.value })}
-                  className="flex-1 px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none font-mono"
-                  placeholder="เช่น ผลงานโรงเรียน"
-                />
-                <button
-                  type="button"
-                  onClick={async () => {
-                    setProvisioningDrive(true);
-                    setDriveError(null);
-                    setDriveProgressText('กำลังเริ่มต้นเชื่อมต่อ Google Drive...');
-                    try {
-                      const rootName = formData.driveRootFolderName.trim() || 'ผลงานโรงเรียน';
-                      const result = await createReal5DepartmentFoldersOnDrive(
-                        rootName,
-                        (step, total, msg) => {
-                          setDriveProgressText(`[${step}/${total}] ${msg}`);
-                        }
-                      );
-                      setDriveProvisionResult(result);
-                      setFormData(prev => ({
-                        ...prev,
-                        driveFolderId: result.rootFolderId,
-                        driveRootFolderName: result.rootFolderName
-                      }));
-                      // Save updated settings with real Google Drive ID
-                      onSaveSettings({
-                        ...formData,
-                        driveFolderId: result.rootFolderId,
-                        driveRootFolderName: result.rootFolderName
-                      });
-                      setDriveProgressText('✓ สร้างโฟลเดอร์ 5 ฝ่ายบน Google Drive เรียบร้อยแล้ว!');
-                    } catch (err: any) {
-                      console.error('Drive creation error:', err);
-                      setDriveError(err?.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ Google Drive');
-                    } finally {
-                      setProvisioningDrive(false);
-                    }
-                  }}
-                  disabled={provisioningDrive}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors disabled:opacity-50 shrink-0"
-                >
-                  <FolderPlus className="w-4 h-4" />
-                  <span>{provisioningDrive ? 'กำลังสร้างโฟลเดอร์...' : 'สร้างโฟลเดอร์บน Google Drive จริง'}</span>
-                </button>
-              </div>
-
-              {provisioningDrive && (
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-2xl flex items-center gap-2 text-xs text-blue-800 font-medium animate-pulse">
-                  <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin shrink-0" />
-                  <span>{driveProgressText || 'กำลังดำเนินการสร้างโฟลเดอร์...'}</span>
+            {/* Firebase Status Badge */}
+            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                  <Flame className="w-5 h-5 text-amber-300" />
                 </div>
-              )}
-
-              {driveError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-2 text-xs text-rose-800">
-                  <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-                  <div className="space-y-1">
-                    <p className="font-bold">ไม่สามารถสร้างโฟลเดอร์บน Google Drive ได้</p>
-                    <p>{driveError}</p>
-                    <p className="text-[11px] text-rose-600">คำแนะนำ: กดปุ่มอีกครั้งและเลือกบัญชี Google ของท่านในหน้าต่างยืนยันสิทธิ์</p>
-                  </div>
-                </div>
-              )}
-
-              {driveProvisionResult && !provisioningDrive && !driveError && (
-                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-2 text-xs text-emerald-900 animate-in fade-in">
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-1.5 font-bold text-emerald-800">
-                      <Check className="w-4 h-4 text-emerald-600" />
-                      <span>สร้างโฟลเดอร์บน Google Drive ของท่านเรียบร้อยแล้ว</span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs font-bold text-emerald-900">
+                      Firebase Cloud Database (Firestore)
+                    </p>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-200 text-emerald-800">
+                      เชื่อมต่อแล้ว (Connected)
                     </span>
-                    {driveProvisionResult.rootFolderUrl && (
-                      <a
-                        href={driveProvisionResult.rootFolderUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-[11px] font-semibold hover:bg-emerald-700 transition-colors shadow-xs"
-                      >
-                        <span>เปิดโฟลเดอร์บน Google Drive</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    )}
                   </div>
-                  <p className="text-[11px] text-emerald-700">
-                    Folder ID: <code className="font-mono bg-emerald-100/70 px-1 py-0.5 rounded">{driveProvisionResult.rootFolderId}</code>
+                  <p className="text-[11px] text-emerald-700 mt-0.5">
+                    ระบบบันทึกผลงานและรางวัลจัดเก็บบน Cloud Firestore แบบ Real-time ถาวร
                   </p>
                 </div>
-              )}
+              </div>
+              <div className="hidden sm:flex items-center gap-1.5 text-xs text-emerald-800 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>พร้อมใช้งาน 5 ฝ่าย</span>
+              </div>
             </div>
 
-            {/* Visual 5 Departments Folder Blueprint */}
-            <div className="p-4 bg-slate-900 rounded-2xl text-slate-300 font-mono text-xs space-y-2 border border-slate-800">
-              <div className="flex items-center justify-between text-amber-400 font-bold border-b border-slate-800 pb-2">
-                <span className="flex items-center gap-1.5">
-                  <FolderTree className="w-4 h-4" />
-                  <span>📁 {formData.driveRootFolderName || 'ผลงานโรงเรียน'} (Google Drive Root)</span>
-                </span>
-                <span className="text-[10px] text-emerald-400 font-normal">● พร้อมใช้งานสำหรับ 5 ฝ่าย</span>
-              </div>
-              <div className="space-y-1 pl-2 text-[11px]">
-                {get5DepartmentsFolderStructure(formData.driveRootFolderName || 'ผลงานโรงเรียน').map((f) => (
-                  <div key={f.departmentId} className="space-y-0.5">
-                    <p className="text-slate-200 font-semibold">
-                      ├── 📂 {f.departmentShort} ({f.departmentName})
+            {/* Access and Security Toggles */}
+            <div className="pt-1 space-y-2.5">
+              {/* One-Click Demo Login Toggle (User Request 3) */}
+              <label className="flex items-start gap-3 p-3.5 bg-indigo-50/70 rounded-2xl border border-indigo-200 cursor-pointer hover:bg-indigo-100/80 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={formData.enableDemoLogin !== false}
+                  onChange={(e) => setFormData({ ...formData, enableDemoLogin: e.target.checked })}
+                  className="w-4 h-4 mt-0.5 text-indigo-600 rounded"
+                />
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs font-bold text-indigo-950">
+                      เปิดใช้งานปุ่ม "เลือกสิทธิ์เข้าใช้งานทันที" (One-Click Demo)
                     </p>
-                    <p className="pl-6 text-slate-400">├── 📄 เกียรติบัตร (Certificates)</p>
-                    <p className="pl-6 text-slate-400">└── 🖼️ ภาพกิจกรรมและเอกสาร (Activities)</p>
+                    <span className="px-2 py-0.2 rounded text-[10px] font-bold bg-indigo-200 text-indigo-800">
+                      {formData.enableDemoLogin !== false ? 'เปิดใช้งานอยู่' : 'ปิดการใช้งาน'}
+                    </span>
                   </div>
-                ))}
-              </div>
-            </div>
+                  <p className="text-[11px] text-indigo-700 mt-0.5">
+                    หากเปิดใช้งาน: ในหน้าต่างเข้าสู่ระบบจะมีปุ่มให้กดทดสอบสิทธิ์ Super Admin และแอดมิน 5 ฝ่ายได้ทันที<br/>
+                    หากปิดใช้งาน: ผู้ใช้จะต้องกรอกชื่อผู้ใช้และรหัสผ่านจริงเพื่อความปลอดภัยสูงสุด
+                  </p>
+                </div>
+              </label>
 
-            <div className="pt-2 space-y-2">
-              <label className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer hover:bg-slate-100/80 transition-colors">
+              {/* Super Admin Approval Toggle */}
+              <label className="flex items-start gap-3 p-3.5 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer hover:bg-slate-100/80 transition-colors">
                 <input
                   type="checkbox"
                   checked={formData.requireSuperAdminApproval}
                   onChange={(e) => setFormData({ ...formData, requireSuperAdminApproval: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 rounded"
+                  className="w-4 h-4 mt-0.5 text-blue-600 rounded"
                 />
                 <div>
                   <p className="text-xs font-bold text-slate-800">
-                    กำหนดให้ผลงานใหม่ต้องผ่านการอนุมัติจาก Super Admin ก่อนเผยแพร่
+                    กำหนดให้ผลงานใหม่ต้องผ่านการอนุมัติจาก Super Admin ก่อนเผยแพร่สู่สาธารณะ
                   </p>
-                  <p className="text-[10px] text-slate-500">
-                    หากเปิดใช้งาน เมื่อ Admin ฝ่ายบันทึกผลงาน จะอยู่ในสถานะ "รอการตรวจสอบ"
+                  <p className="text-[10px] text-slate-500 mt-0.5">
+                    หากเปิดใช้งาน: เมื่อแอดมินฝ่ายบันทึกผลงาน ข้อมูลจะอยู่ในสถานะ "รอการตรวจสอบ" จนกว่า Super Admin จะกดอนุมัติ
                   </p>
                 </div>
               </label>
 
-              <label className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer hover:bg-slate-100/80 transition-colors">
+              {/* Download Certificate Toggle */}
+              <label className="flex items-start gap-3 p-3.5 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer hover:bg-slate-100/80 transition-colors">
                 <input
                   type="checkbox"
                   checked={formData.defaultAllowDownload}
                   onChange={(e) => setFormData({ ...formData, defaultAllowDownload: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 rounded"
+                  className="w-4 h-4 mt-0.5 text-blue-600 rounded"
                 />
                 <div>
                   <p className="text-xs font-bold text-slate-800">
-                    อนุญาตให้บุคคลทั่วไปดาวน์โหลดไฟล์เกียรติบัตรต้นฉบับได้โดยค่าเริ่มต้น
+                    อนุญาตให้บุคคลทั่วไปเปิดดูและดาวน์โหลดรูปภาพเกียรติบัตรต้นฉบับได้
                   </p>
-                  <p className="text-[10px] text-slate-500">
-                    ผู้ใช้สามารถกดเปิดไฟล์ใน Google Drive และดาวน์โหลดได้
+                  <p className="text-[10px] text-slate-500 mt-0.5">
+                    ผู้ใช้สามารถคลิกเปิดดูภาพเกียรติบัตรความละเอียดสูงและบันทึกไฟล์ได้
                   </p>
                 </div>
               </label>

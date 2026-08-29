@@ -14,7 +14,7 @@ import {
   ArrowRight,
   AlertCircle
 } from 'lucide-react';
-import { AppUser, DepartmentId } from '../types';
+import { AppUser, DepartmentId, SystemSettings } from '../types';
 import { INITIAL_USERS, DEPARTMENTS } from '../data/mockData';
 import { googleSignIn } from '../lib/firebase';
 
@@ -22,15 +22,18 @@ interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLogin: (user: AppUser) => void;
+  settings?: SystemSettings;
 }
 
-export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => {
+export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin, settings }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [googleLoading, setGoogleLoading] = useState(false);
 
   if (!isOpen) return null;
+
+  const showDemoLogin = settings?.enableDemoLogin !== false;
 
   const handleGoogleLogin = async () => {
     try {
@@ -74,7 +77,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
       onLogin(found);
       onClose();
     } else {
-      setError('ไม่พบบัญชีผู้ใช้นี้ (ทดลองกดเลือกบัญชีสาธิตด้านล่างได้ทันที)');
+      setError('ไม่พบบัญชีผู้ใช้นี้ กรุณาตรวจสอบชื่อผู้ใช้หรืออีเมล');
     }
   };
 
@@ -117,73 +120,80 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-6">
-          {/* Quick Demo One-Click Logins */}
-          <div>
-            <div className="flex items-center justify-between mb-2.5">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                เลือกสิทธิ์เข้าใช้งานทันที (One-Click Demo)
-              </span>
-              <span className="text-[11px] text-blue-600 font-semibold">
-                กดเพื่อเข้าใช้งาน
-              </span>
-            </div>
+        <div className="p-6 space-y-5">
+          {/* Quick Demo One-Click Logins (Shown only when enabled in settings) */}
+          {showDemoLogin ? (
+            <div>
+              <div className="flex items-center justify-between mb-2.5">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  เลือกสิทธิ์เข้าใช้งานทันที (One-Click Demo)
+                </span>
+                <span className="text-[11px] text-blue-600 font-semibold">
+                  เปิดใช้งานโดยแอดมิน
+                </span>
+              </div>
 
-            <div className="space-y-2">
-              {/* Super Admin */}
-              <button
-                id="login-quick-super-admin"
-                onClick={() => handleSelectQuickAccount(INITIAL_USERS[0])}
-                className="w-full text-left p-3 rounded-xl border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100/80 transition-all flex items-center justify-between group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
-                    SA
+              <div className="space-y-2">
+                {/* Super Admin */}
+                <button
+                  id="login-quick-super-admin"
+                  onClick={() => handleSelectQuickAccount(INITIAL_USERS[0])}
+                  className="w-full text-left p-3 rounded-xl border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100/80 transition-all flex items-center justify-between group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                      SA
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900 text-xs sm:text-sm">
+                        Super Admin (ผู้อำนวยการ / ผู้ดูแลสูงสุด)
+                      </p>
+                      <p className="text-[11px] text-indigo-700">
+                        จัดการได้ทุกฝ่าย, เพิ่มผู้ใช้, อนุมัติผลงาน, ดูรายงานรวม
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-bold text-slate-900 text-xs sm:text-sm">
-                      Super Admin (ผู้อำนวยการ / ผู้ดูแลสูงสุด)
-                    </p>
-                    <p className="text-[11px] text-indigo-700">
-                      จัดการได้ทุกฝ่าย, เพิ่มผู้ใช้, อนุมัติผลงาน, ดูรายงานรวม
-                    </p>
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-indigo-600 group-hover:translate-x-1 transition-transform" />
-              </button>
+                  <ArrowRight className="w-4 h-4 text-indigo-600 group-hover:translate-x-1 transition-transform" />
+                </button>
 
-              {/* 5 Department Admins */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                {INITIAL_USERS.slice(1).map((usr) => {
-                  const dept = DEPARTMENTS[usr.department];
-                  return (
-                    <button
-                      key={usr.uid}
-                      id={`login-quick-${usr.username}`}
-                      onClick={() => handleSelectQuickAccount(usr)}
-                      className="text-left p-2.5 rounded-xl border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white transition-all flex items-center justify-between group"
-                    >
-                      <div className="flex items-center gap-2 truncate">
-                        <span 
-                          className="w-2.5 h-2.5 rounded-full shrink-0" 
-                          style={{ backgroundColor: dept?.color }} 
-                        />
-                        <div className="truncate">
-                          <p className="font-semibold text-slate-800 text-xs truncate">
-                            Admin {dept?.shortName}
-                          </p>
-                          <p className="text-[10px] text-slate-500 truncate">
-                            {usr.displayName.split(' ')[0]}
-                          </p>
+                {/* 5 Department Admins */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                  {INITIAL_USERS.slice(1).map((usr) => {
+                    const dept = DEPARTMENTS[usr.department];
+                    return (
+                      <button
+                        key={usr.uid}
+                        id={`login-quick-${usr.username}`}
+                        onClick={() => handleSelectQuickAccount(usr)}
+                        className="text-left p-2.5 rounded-xl border border-slate-200 hover:border-blue-400 bg-slate-50 hover:bg-white transition-all flex items-center justify-between group"
+                      >
+                        <div className="flex items-center gap-2 truncate">
+                          <span 
+                            className="w-2.5 h-2.5 rounded-full shrink-0" 
+                            style={{ backgroundColor: dept?.color }} 
+                          />
+                          <div className="truncate">
+                            <p className="font-semibold text-slate-800 text-xs truncate">
+                              Admin {dept?.shortName}
+                            </p>
+                            <p className="text-[10px] text-slate-500 truncate">
+                              {usr.displayName.split(' ')[0]}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
-                    </button>
-                  );
-                })}
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>โหมด One-Click Demo ถูกปิดการใช้งานโดยผู้ดูแลระบบ กรุณาเข้าสู่ระบบด้วยชื่อผู้ใช้และรหัสผ่าน</span>
+            </div>
+          )}
 
           {/* Google Sign In Button */}
           <div>
@@ -204,13 +214,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                   <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
                 </svg>
               )}
-              <span>{googleLoading ? 'กำลังเข้าสู่ระบบด้วย Google...' : 'เข้าสู่ระบบด้วย Google (สำหรับ Google Drive)'}</span>
+              <span>{googleLoading ? 'กำลังเข้าสู่ระบบด้วย Google...' : 'เข้าสู่ระบบด้วย Google'}</span>
             </button>
           </div>
 
           <div className="relative flex py-1 items-center">
             <div className="grow border-t border-slate-200"></div>
-            <span className="shrink mx-4 text-xs text-slate-400">หรือ เลือกบัญชีสาธิต</span>
+            <span className="shrink mx-4 text-xs text-slate-400">หรือ เข้าสู่ระบบด้วยรหัสผ่าน</span>
             <div className="grow border-t border-slate-200"></div>
           </div>
 

@@ -135,7 +135,7 @@ export const INITIAL_SETTINGS: SystemSettings = {
   accentColor: '#10b981', // Emerald
   requireSuperAdminApproval: false,
   defaultAllowDownload: true,
-  driveRootFolderName: 'ผลงานโรงเรียน',
+  enableDemoLogin: true,
   enableHallOfFame: true,
   enableActivityLogging: true,
   itemsPerPage: 12

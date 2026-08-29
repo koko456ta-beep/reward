@@ -2,15 +2,14 @@ import React from 'react';
 import { 
   BookOpen, 
   ShieldCheck, 
-  HardDrive, 
+  Database, 
   Sparkles, 
   Layers, 
   Cpu, 
   CheckCircle2, 
   AlertCircle, 
-  Database, 
   Lock, 
-  FolderTree, 
+  Flame, 
   Zap,
   Building2
 } from 'lucide-react';
@@ -29,7 +28,7 @@ export const DocsArchitectureView: React.FC = () => {
           คู่มือการทำงานและโครงสร้างระบบจัดเก็บผลงาน 5 ฝ่าย
         </h2>
         <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          วิเคราะห์สถาปัตยกรรม (Architecture Analysis), แผนผังความปลอดภัย, และการเชื่อมต่อ Google Drive
+          วิเคราะห์สถาปัตยกรรม (Architecture Analysis), แผนผังความปลอดภัย RBAC, และฐานข้อมูล Firebase Firestore
         </p>
       </div>
 
@@ -47,17 +46,17 @@ export const DocsArchitectureView: React.FC = () => {
               <span>Frontend Layer</span>
             </div>
             <p className="text-slate-600 leading-relaxed">
-              React 18 + Vite + Tailwind CSS พร้อมระบบ Lightbox ดูภาพขยาย, ค้นหาแบบ Real-time และ Responsive เต็มรูปแบบบนมือถือ แท็บเล็ต และคอมพิวเตอร์
+              React 18 + Vite + Tailwind CSS พร้อมฟอนต์ Prompt ทั้งระบบ, ระบบซูมภาพเกียรติบัตร, ค้นหาแบบ Real-time และ Responsive เต็มรูปแบบทุกอุปกรณ์
             </p>
           </div>
 
           <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100 space-y-2">
             <div className="flex items-center gap-2 font-bold text-emerald-900">
-              <HardDrive className="w-4 h-4 text-emerald-600" />
-              <span>Storage Layer</span>
+              <Database className="w-4 h-4 text-emerald-600" />
+              <span>Database Layer</span>
             </div>
             <p className="text-slate-600 leading-relaxed">
-              <strong>Google Drive Integration:</strong> ลดค่าใช้จ่าย Firebase Storage โดยจัดเก็บไฟล์เกียรติบัตรต้นฉบับและภาพผลงานบน Google Drive พร้อมระบบแยกโฟลเดอร์ตาม 5 ฝ่าย
+              <strong>Firebase Firestore:</strong> ฐานข้อมูลคลาวด์ Real-time จัดเก็บข้อมูลผลงาน รางวัล และสิทธิ์ผู้ใช้งาน 5 ฝ่าย พร้อมความปลอดภัยระดับมาตรฐาน
             </p>
           </div>
 
@@ -67,7 +66,7 @@ export const DocsArchitectureView: React.FC = () => {
               <span>Security & RBAC</span>
             </div>
             <p className="text-slate-600 leading-relaxed">
-              ระบบตรวจสอบสิทธิ์แบบแยก 5 ฝ่าย (Department-based RBAC) และ Super Admin พร้อมบันทึกประวัติการทำงาน Audit Log ทุกขั้นตอน
+              ระบบตรวจสอบสิทธิ์แบบแยก 5 ฝ่าย (Department-based RBAC) และ Super Admin พร้อมระบบเปิด-ปิด One-Click Demo และ Audit Log
             </p>
           </div>
         </div>
@@ -113,24 +112,22 @@ export const DocsArchitectureView: React.FC = () => {
         </div>
       </div>
 
-      {/* SECTION 3: Google Drive Folder Structure */}
+      {/* SECTION 3: Firebase Database Collection Schema */}
       <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
         <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-          <FolderTree className="w-5 h-5 text-amber-600" />
-          <span>3. โครงสร้างโฟลเดอร์ Google Drive (Folder Structure Standard)</span>
+          <Flame className="w-5 h-5 text-amber-500" />
+          <span>3. โครงสร้างคอลเลกชัน Firebase Firestore (Database Schema)</span>
         </h3>
 
         <div className="p-4 rounded-2xl bg-slate-900 text-slate-200 font-mono text-xs space-y-1.5 overflow-x-auto">
-          <p className="text-amber-400">📁 ผลงานโรงเรียน/ (Root Folder)</p>
-          <p className="pl-4">├── 📁 ฝ่ายวิชาการ/ (Academic)</p>
-          <p className="pl-8 text-slate-400">├── 📁 เกียรติบัตร/</p>
-          <p className="pl-8 text-slate-400">└── 📁 ภาพถ่ายผลงาน/</p>
-          <p className="pl-4">├── 📁 ฝ่ายกิจการนักเรียน/ (Affairs)</p>
-          <p className="pl-8 text-slate-400">├── 📁 เกียรติบัตร/</p>
-          <p className="pl-8 text-slate-400">└── 📁 ภาพถ่ายผลงาน/</p>
-          <p className="pl-4">├── 📁 ฝ่ายทั่วไปโรงเรียน/ (General)</p>
-          <p className="pl-4">├── 📁 ฝ่ายบุคคล/ (Personnel)</p>
-          <p className="pl-4">└── 📁 ฝ่ายงบประมาณ/ (Budget)</p>
+          <p className="text-amber-400">🔥 Firestore Collections</p>
+          <p className="pl-4">├── 📁 awards/ (เอกสารผลงานและรางวัลทั้งหมด 5 ฝ่าย)</p>
+          <p className="pl-8 text-slate-400">├── awardName, recipientName, recipientType, department</p>
+          <p className="pl-8 text-slate-400">├── level, academicYear, awardDate, organizer, imageUrl</p>
+          <p className="pl-8 text-slate-400">└── status, featured, allowDownload, tags, createdBy</p>
+          <p className="pl-4">├── 📁 users/ (บัญชีผู้ดูแลระบบ 5 ฝ่าย และ Super Admin)</p>
+          <p className="pl-4">├── 📁 settings/ (การตั้งค่าระบบ, โลโก้โรงเรียน, และสิทธิ์ Demo)</p>
+          <p className="pl-4">└── 📁 logs/ (ประวัติกิจกรรม Audit Trail)</p>
         </div>
       </div>
 
@@ -142,7 +139,7 @@ export const DocsArchitectureView: React.FC = () => {
         </h3>
 
         <p className="text-xs text-slate-600 leading-relaxed">
-          ระบบประมวลผลการบีบอัดภาพเกียรติบัตรบนเบราว์เซอร์ของผู้ใช้โดยตรงก่อนส่งขึ้นคลาวด์ ผ่าน HTML5 Canvas Resolution Scaling (Max 1920px, Quality 0.85) ช่วยลดขนาดไฟล์ภาพจาก 5-8MB ลงเหลือเฉลี่ยเพียง 400-800KB โดยที่ตัวหนังสือและตราโรงเรียนบนเกียรติบัตรยังคงคมชัด 100% ทำให้เปิดดูได้เร็วแม้บนเครือข่ายมือถือ
+          ระบบประมวลผลการบีบอัดภาพเกียรติบัตรบนเบราว์เซอร์ของผู้ใช้โดยตรงก่อนส่งขึ้นฐานข้อมูล ผ่าน HTML5 Canvas Resolution Scaling (Max 1920px, Quality 0.85) ช่วยลดขนาดไฟล์ภาพจาก 5-8MB ลงเหลือเฉลี่ยเพียง 200-500KB โดยที่ตัวหนังสือและตราโรงเรียนบนเกียรติบัตรยังคงคมชัด 100% ประหยัดพื้นที่คลาวด์และโหลดดูได้รวดเร็วทันที
         </p>
       </div>
     </div>

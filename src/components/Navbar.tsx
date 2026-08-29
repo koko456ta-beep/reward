@@ -109,8 +109,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="flex items-center gap-3 cursor-pointer group select-none"
           >
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-blue-700 via-indigo-600 to-amber-500 p-0.5 shadow-md group-hover:scale-105 transition-transform flex items-center justify-center shrink-0">
-              <div className="w-full h-full bg-white rounded-[10px] flex items-center justify-center overflow-hidden">
-                <Trophy className="w-6 h-6 text-amber-500" />
+              <div className="w-full h-full bg-white rounded-[10px] flex items-center justify-center overflow-hidden p-1">
+                {settings?.schoolLogoUrl ? (
+                  <img
+                    src={settings.schoolLogoUrl}
+                    alt={settings.schoolName || 'School Logo'}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <Trophy className="w-6 h-6 text-amber-500" />
+                )}
               </div>
             </div>
             <div className="flex flex-col">

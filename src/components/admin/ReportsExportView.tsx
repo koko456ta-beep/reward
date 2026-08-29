@@ -176,6 +176,15 @@ export const ReportsExportView: React.FC<ReportsExportViewProps> = ({
       <div className="bg-white p-8 sm:p-12 rounded-3xl border border-slate-200 shadow-lg space-y-8 print:border-none print:shadow-none print:p-0">
         {/* Official School Header */}
         <div className="text-center pb-6 border-b-2 border-slate-900 space-y-2">
+          {safeSettings.schoolLogoUrl && (
+            <div className="w-16 h-16 mx-auto mb-2 flex items-center justify-center">
+              <img
+                src={safeSettings.schoolLogoUrl}
+                alt={safeSettings.schoolName}
+                className="max-h-full max-w-full object-contain"
+              />
+            </div>
+          )}
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
             แบบรายงานสรุปข้อมูลผลงานและรางวัลเชิดชูเกียรติ
           </h1>

@@ -132,8 +132,16 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             </button>
 
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-xs font-bold text-amber-300">
-                <Trophy className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-xs font-bold text-amber-300 overflow-hidden p-1 bg-white">
+                {safeSettings.schoolLogoUrl ? (
+                  <img
+                    src={safeSettings.schoolLogoUrl}
+                    alt={safeSettings.schoolName}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <Trophy className="w-5 h-5 text-amber-500" />
+                )}
               </div>
               <div className="hidden sm:block">
                 <p className="font-bold text-sm text-white tracking-tight leading-tight">
@@ -296,11 +304,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
           {/* Sidebar Footer */}
           <div className="p-4 border-t border-slate-100 text-xs text-slate-400 flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-[11px]">
-              <HardDrive className="w-3.5 h-3.5 text-blue-500" />
-              <span>Google Drive Connected</span>
+            <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Firebase Firestore</span>
             </span>
-            <span className="text-[10px] font-mono">v2.5</span>
+            <span className="text-[10px] font-mono text-slate-400">Cloud Sync</span>
           </div>
         </aside>
 
