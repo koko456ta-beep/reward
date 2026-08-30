@@ -55,6 +55,7 @@ export interface Award {
   deleted?: boolean;
   driveFolder?: string;
   viewsCount?: number;
+  likesCount?: number;
 }
 
 export type UserRole = 'super_admin' | 'academic_admin' | 'affairs_admin' | 'general_admin' | 'personnel_admin' | 'budget_admin';
@@ -64,6 +65,7 @@ export interface AppUser {
   username: string;
   displayName: string;
   email: string;
+  password?: string;
   role: UserRole;
   department: DepartmentId | 'all';
   status: 'active' | 'inactive';

@@ -504,6 +504,47 @@ export async function updateUser(user: AppUser): Promise<boolean> {
   }
 }
 
+export async function deleteUser(userId: string): Promise<boolean> {
+  const current = getStoredUsers();
+  const filtered = current.filter(u => u.uid !== userId);
+  saveStoredUsers(filtered);
+
+  try {
+    const docRef = doc(db, 'users', userId);
+    await deleteDoc(docRef);
+    return true;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.DELETE, `users/${userId}`);
+    return false;
+  }
+}
+
+export async function toggleLikeAward(awardId: string): Promise<number> {
+  const awards = getStoredAwards();
+  const target = awards.find(a => a.id === awardId);
+  if (!target) return 0;
+
+  const currentLikes = target.likesCount || 0;
+  // Read liked state from local storage
+  const likedKey = `liked_award_${awardId}`;
+  const isLiked = localStorage.getItem(likedKey) === 'true';
+  const newLiked = !isLiked;
+  const newCount = Math.max(0, isLiked ? currentLikes - 1 : currentLikes + 1);
+
+  localStorage.setItem(likedKey, newLiked ? 'true' : 'false');
+  target.likesCount = newCount;
+  saveStoredAwards(awards);
+
+  try {
+    const docRef = doc(db, 'awards', awardId);
+    await updateDoc(docRef, { likesCount: newCount });
+  } catch (err) {
+    // Firestore error fallback to local
+  }
+
+  return newCount;
+}
+
 export async function logActivity(params: {
   userId: string;
   userName: string;
